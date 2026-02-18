@@ -1,0 +1,105 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>NeuroType</title>
+    <link rel="stylesheet" href="style.css">
+    <script src="app.js"></script>
+    <style>
+        .play-button {
+            padding: 15px 40px;
+            font-size: 20px;
+            cursor: pointer;
+            background-color: #4CAF50;
+            border: 2px solid #333;
+            border-radius: 5px;
+            color: white;
+            transition: background-color 0.3s;
+            margin-top: 20px;
+        }
+
+        .play-button:hover {
+            background-color: #45a049;
+        }
+
+        .user-info {
+            background-color: #b7b18f;
+            padding: 10px 20px;
+            text-align: right;
+            color: white;
+            font-size: 14px;
+        }
+
+        .user-info a {
+            color: #ffff00;
+            text-decoration: none;
+            margin-left: 10px;
+        }
+
+        .user-info a:hover {
+            text-decoration: underline;
+        }
+    </style>
+</head>
+
+<body>
+
+<!-- User Info Bar -->
+<div id="user-info-bar" class="user-info" style="display: none;"></div>
+
+<!-- Navigation -->
+<div class="navbar">
+    <a href="index.html">Home</a>
+    <a href="about.html">About</a>
+    <a href="account.html">Account</a>
+    <a href="login.html">Login</a>
+    <a href="logout.html">Logout</a>
+</div>
+
+<!-- Main Content -->
+<div class="main">
+    <h1>NeuroType.</h1>
+    <p>Est. 2026</p>
+
+    <div class="content-box">
+        <h2>Play!</h2>
+        <p>Race against and<br>beat the bot!</p>
+        <button class="play-button" onclick="handlePlayClick()">START RACE</button>
+    </div>
+</div>
+
+<!-- Footer -->
+<div class="footer">
+    <a href="#">Contact</a>
+    <a href="#">Instagram</a>
+    <a href="about.html">About</a>
+    <a href="logout.html">Logout</a>
+    <a href="index.html">Home</a>
+</div>
+
+<script>
+    function handlePlayClick() {
+        if (app.isLoggedIn()) {
+            window.location.href = 'game.html';
+        } else {
+            window.location.href = 'login.html';
+        }
+    }
+
+    // Display user info if logged in
+    function updateUserInfo() {
+        const userInfoBar = document.getElementById('user-info-bar');
+        if (app.isLoggedIn()) {
+            const user = app.getCurrentUser();
+            userInfoBar.innerHTML = `Logged in as <strong>${user.username}</strong> | <a href="account.html">View Stats</a> | <a href="logout.html">Logout</a>`;
+            userInfoBar.style.display = 'block';
+        } else {
+            userInfoBar.style.display = 'none';
+        }
+    }
+
+    // Update on page load
+    updateUserInfo();
+</script>
+
+</body>
+</html>

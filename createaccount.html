@@ -1,0 +1,97 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Create Account - NeuroType</title>
+    <link rel="stylesheet" href="style.css">
+    <script src="app.js"></script>
+</head>
+
+<body>
+
+<div class="navbar">
+    <a href="index.html">Home</a>
+    <a href="about.html">About</a>
+    <a href="account.html">Account</a>
+    <a href="login.html">Login</a>
+    <a href="logout.html">Logout</a>
+</div>
+
+<div class="main">
+    <h1>Create Account</h1>
+
+    <div class="content-box">
+        <div id="error-message" style="color: red; margin-bottom: 10px; display: none;"></div>
+        <div id="success-message" style="color: green; margin-bottom: 10px; display: none;"></div>
+        
+        <p>Username: <br><input type="text" id="new-username" placeholder="Choose a username"></p>
+        <p>Password: <br><input type="password" id="new-password" placeholder="Enter a password">
+        <br><small style="color: #666;">Password must be at least 6 characters with a special character (!@#$%^&* etc.)</small></p>
+        <p>Confirm Password: <br><input type="password" id="confirm-password" placeholder="Confirm password"></p>
+
+        <button onclick="handleCreateAccount()" style="padding: 10px 30px; margin-top: 10px; cursor: pointer;">Create Account</button>
+
+        <p style="margin-top: 20px;">Already have an account?</p>
+        <p><a href="login.html">Login</a></p>
+    </div>
+</div>
+
+<div class="footer">
+    <a href="#">Contact</a>
+    <a href="#">Instagram</a>
+    <a href="about.html">About</a>
+    <a href="logout.html">Logout</a>
+    <a href="index.html">Home</a>
+</div>
+
+<script>
+    // Redirect if already logged in
+    if (app.isLoggedIn()) {
+        window.location.href = 'index.html';
+    }
+
+    function handleCreateAccount() {
+        const username = document.getElementById('new-username').value.trim();
+        const password = document.getElementById('new-password').value;
+        const confirmPassword = document.getElementById('confirm-password').value;
+        const errorDiv = document.getElementById('error-message');
+        const successDiv = document.getElementById('success-message');
+
+        errorDiv.style.display = 'none';
+        successDiv.style.display = 'none';
+
+        if (!username || !password || !confirmPassword) {
+            errorDiv.textContent = 'Please fill in all fields';
+            errorDiv.style.display = 'block';
+            return;
+        }
+
+        if (password !== confirmPassword) {
+            errorDiv.textContent = 'Passwords do not match';
+            errorDiv.style.display = 'block';
+            return;
+        }
+
+        const result = app.createAccount(username, password);
+
+        if (result.success) {
+            successDiv.textContent = 'Account created successfully! Redirecting...';
+            successDiv.style.display = 'block';
+            setTimeout(() => {
+                window.location.href = 'index.html';
+            }, 1500);
+        } else {
+            errorDiv.textContent = result.message;
+            errorDiv.style.display = 'block';
+        }
+    }
+
+    // Allow Enter key to create account
+    document.addEventListener('keypress', (e) => {
+        if (e.key === 'Enter') {
+            handleCreateAccount();
+        }
+    });
+</script>
+
+</body>
+</html>

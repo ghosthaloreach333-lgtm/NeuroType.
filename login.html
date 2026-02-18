@@ -1,0 +1,78 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Login - NeuroType</title>
+    <link rel="stylesheet" href="style.css">
+    <script src="app.js"></script>
+</head>
+
+<body>
+
+<div class="navbar">
+    <a href="index.html">Home</a>
+    <a href="about.html">About</a>
+    <a href="account.html">Account</a>
+    <a href="login.html">Login</a>
+    <a href="logout.html">Logout</a>
+</div>
+
+<div class="main">
+    <h1>Login</h1>
+
+    <div class="content-box">
+        <div id="error-message" style="color: red; margin-bottom: 10px; display: none;"></div>
+        <p>User: <br><input type="text" id="username" placeholder="Enter username"></p>
+        <p>Password: <br><input type="password" id="password" placeholder="Enter password"></p>
+
+        <button onclick="handleLogin()" style="padding: 10px 30px; margin-top: 10px; cursor: pointer;">Login</button>
+
+        <p style="margin-top: 20px;">Don't have an Account?</p>
+        <p><a href="createaccount.html">Signup</a></p>
+    </div>
+</div>
+
+<div class="footer">
+    <a href="#">Contact</a>
+    <a href="#">Instagram</a>
+    <a href="about.html">About</a>
+    <a href="logout.html">Logout</a>
+    <a href="index.html">Home</a>
+</div>
+
+<script>
+    // Redirect if already logged in
+    if (app.isLoggedIn()) {
+        window.location.href = 'index.html';
+    }
+
+    function handleLogin() {
+        const username = document.getElementById('username').value.trim();
+        const password = document.getElementById('password').value;
+        const errorDiv = document.getElementById('error-message');
+
+        if (!username || !password) {
+            errorDiv.textContent = 'Please enter both username and password';
+            errorDiv.style.display = 'block';
+            return;
+        }
+
+        const result = app.login(username, password);
+
+        if (result.success) {
+            window.location.href = 'index.html';
+        } else {
+            errorDiv.textContent = result.message;
+            errorDiv.style.display = 'block';
+        }
+    }
+
+    // Allow Enter key to login
+    document.addEventListener('keypress', (e) => {
+        if (e.key === 'Enter') {
+            handleLogin();
+        }
+    });
+</script>
+
+</body>
+</html>

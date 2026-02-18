@@ -1,0 +1,47 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Logout - NeuroType</title>
+    <link rel="stylesheet" href="style.css">
+    <script src="app.js"></script>
+</head>
+
+<body>
+
+<div class="navbar">
+    <a href="index.html">Home</a>
+    <a href="about.html">About</a>
+    <a href="account.html">Account</a>
+    <a href="login.html">Login</a>
+    <a href="logout.html">Logout</a>
+</div>
+
+<div class="main">
+    <h1>Logout</h1>
+
+    <div class="content-box">
+        <p>Are you sure you would like to logout?</p>
+        <p>
+            <button onclick="confirmLogout()" style="padding: 8px 20px; margin: 10px; cursor: pointer; background-color: #f44336; color: white; border: none; border-radius: 3px;">Yes, Logout</button>
+            <button onclick="window.location.href='index.html'" style="padding: 8px 20px; margin: 10px; cursor: pointer; background-color: #4CAF50; color: white; border: none; border-radius: 3px;">Cancel</button>
+        </p>
+    </div>
+</div>
+
+<div class="footer">
+    <a href="#">Contact</a>
+    <a href="#">Instagram</a>
+    <a href="about.html">About</a>
+    <a href="logout.html">Logout</a>
+    <a href="index.html">Home</a>
+</div>
+
+<script>
+    function confirmLogout() {
+        app.logout();
+        window.location.href = 'login.html';
+    }
+</script>
+
+</body>
+</html>

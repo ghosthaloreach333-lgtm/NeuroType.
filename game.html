@@ -1,0 +1,708 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Game - NeuroType</title>
+    <link rel="stylesheet" href="style.css">
+    <script src="app.js"></script>
+    <style>
+        .game-container {
+            display: flex;
+            gap: 20px;
+            margin: 20px auto;
+            max-width: 900px;
+        }
+
+        .player-section, .bot-section {
+            flex: 1;
+            border: 2px solid #333;
+            padding: 20px;
+            background-color: #d6d0b8;
+            border-radius: 5px;
+        }
+
+        .player-section h3, .bot-section h3 {
+            margin-top: 0;
+        }
+
+        .typing-box-container {
+            position: relative;
+            width: 100%;
+            margin: 15px 0;
+            overflow: hidden;
+        }
+
+        .prompt-display {
+            background-color: #fff;
+            border: 2px solid #b7b18f;
+            border-radius: 3px;
+            padding: 15px;
+            min-height: 70px;
+            font-size: 22px;
+            line-height: 2;
+            color: transparent;
+            word-wrap: break-word;
+            position: relative;
+            font-family: 'Courier New', monospace;
+            font-weight: bold;
+            letter-spacing: 1px;
+            overflow: hidden;
+        }
+
+        .typed-text {
+            position: absolute;
+            top: 15px;
+            left: 15px;
+            font-size: 22px;
+            line-height: 2;
+            color: #000;
+            font-family: 'Courier New', monospace;
+            font-weight: bold;
+            letter-spacing: 1px;
+            z-index: 2;
+            max-width: calc(100% - 30px);
+            overflow: hidden;
+            white-space: pre-wrap;
+        }
+
+        .remaining-text {
+            position: absolute;
+            top: 15px;
+            left: 15px;
+            font-size: 22px;
+            line-height: 2;
+            color: #b7b18f;
+            font-family: 'Courier New', monospace;
+            font-weight: bold;
+            letter-spacing: 1px;
+            visibility: visible;
+            z-index: 1;
+            max-width: calc(100% - 30px);
+            overflow: hidden;
+            white-space: pre-wrap;
+        }
+
+        .typing-input-hidden {
+            position: absolute;
+            left: -9999px;
+            opacity: 0;
+        }
+
+        .invisible-input {
+            width: 100%;
+            position: absolute;
+            top: 0;
+            left: 0;
+            opacity: 0;
+            height: 90px;
+            cursor: text;
+            z-index: 10;
+        }
+
+        .atom-display {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100px;
+            font-size: 80px;
+            margin: 10px 0;
+        }
+
+        .atom {
+            position: relative;
+            width: 60px;
+            height: 60px;
+            display: inline-block;
+        }
+
+        .atom-nucleus {
+            position: absolute;
+            width: 10px;
+            height: 10px;
+            background-color: #333;
+            border-radius: 50%;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+        }
+
+        .atom-orbit {
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            border: 2px solid #b7b18f;
+            border-radius: 50%;
+            top: 0;
+            left: 0;
+            animation: rotate 3s linear infinite;
+        }
+
+        .atom-electron {
+            position: absolute;
+            width: 6px;
+            height: 6px;
+            background-color: #4CAF50;
+            border-radius: 50%;
+            top: 0;
+            left: 50%;
+            transform: translateX(-50%);
+        }
+
+        @keyframes rotate {
+            from { transform: rotate(0deg); }
+            to { transform: rotate(360deg); }
+        }
+
+        @keyframes pulse {
+            0%, 100% { transform: scale(1); }
+            50% { transform: scale(1.2); }
+        }
+
+        .atom.active .atom-electron {
+            animation: pulse 0.6s ease-in-out infinite;
+        }
+
+        .progress-bar {
+            width: 100%;
+            height: 20px;
+            background-color: #ddd;
+            border: 1px solid #999;
+            border-radius: 3px;
+            overflow: hidden;
+            margin: 10px 0;
+        }
+
+        .progress-fill {
+            height: 100%;
+            background-color: #4CAF50;
+            width: 0%;
+            transition: width 0.1s;
+        }
+
+        .game-controls {
+            text-align: center;
+            margin: 30px 0;
+        }
+
+        .btn {
+            padding: 12px 30px;
+            font-size: 16px;
+            cursor: pointer;
+            background-color: #b7b18f;
+            border: 2px solid #333;
+            border-radius: 3px;
+            color: white;
+            margin: 0 10px;
+        }
+
+        .btn:hover {
+            background-color: #9a9570;
+        }
+
+        .btn:disabled {
+            background-color: #ccc;
+            cursor: not-allowed;
+        }
+
+        .result-box {
+            background-color: #fff;
+            border: 2px solid #333;
+            padding: 30px;
+            margin: 30px auto;
+            max-width: 600px;
+            border-radius: 5px;
+            text-align: center;
+            display: block;
+        }
+
+        .result-box h2 {
+            margin-top: 0;
+            font-size: 32px;
+        }
+
+        .result-box.win {
+            background-color: #90EE90;
+        }
+
+        .result-box.loss {
+            background-color: #FFB6C6;
+        }
+
+        .result-detail {
+            margin: 10px 0;
+            font-size: 18px;
+        }
+
+        .hidden {
+            display: none !important;
+        }
+
+        .placement-text {
+            text-align: center;
+            color: #666;
+            margin: 20px 0;
+        }
+
+        .next-race-section {
+            background-color: #d6d0b8;
+            border: 2px solid #333;
+            padding: 40px;
+            margin: 30px auto;
+            max-width: 600px;
+            border-radius: 5px;
+            text-align: center;
+            display: block;
+        }
+
+        .next-race-section h2 {
+            margin-top: 0;
+            font-size: 28px;
+        }
+    </style>
+</head>
+
+<body>
+
+<div class="navbar">
+    <a href="index.html">Home</a>
+    <a href="about.html">About</a>
+    <a href="account.html">Account</a>
+    <a href="login.html">Login</a>
+    <a href="logout.html">Logout</a>
+</div>
+
+<div class="main">
+    <h1>Typing Race</h1>
+
+    <!-- Placement Match Section -->
+    <div id="placement-section" class="content-box" style="max-width: 600px;">
+        <h2>Placement Match</h2>
+        <p class="placement-text">Type the following text to determine your skill level:</p>
+        <div class="prompt-box" id="placement-prompt"></div>
+        <input type="text" class="typing-input" id="placement-input" placeholder="Type here..." autocomplete="off">
+        <div class="stats-display">
+            <div class="stat-item">WPM: <span id="placement-wpm">0</span></div>
+            <div class="stat-item">Accuracy: <span id="placement-accuracy">100</span>%</div>
+            <div class="stat-item">Time: <span id="placement-time">0</span>s</div>
+        </div>
+        <div class="game-controls">
+            <button class="btn" onclick="startPlacementMatch()">Start</button>
+        </div>
+    </div>
+
+    <!-- Race Section -->
+    <div id="race-section" class="hidden">
+        <div class="game-container">
+            <div class="player-section">
+                <h3>You</h3>
+                <div class="typing-box-container">
+                    <div class="prompt-display" id="player-prompt-display"></div>
+                    <div class="typed-text" id="player-typed-text"></div>
+                    <div class="remaining-text" id="player-remaining-text"></div>
+                    <input type="text" class="invisible-input" id="player-input" autocomplete="off">
+                </div>
+                <div class="atom-display">
+                    <div class="atom" id="player-atom">
+                        <div class="atom-nucleus"></div>
+                        <div class="atom-orbit">
+                            <div class="atom-electron"></div>
+                        </div>
+                    </div>
+                </div>
+                <div class="progress-bar">
+                    <div class="progress-fill" id="player-progress"></div>
+                </div>
+                <div style="text-align: center; padding: 10px;">
+                    <div style="font-size: 14px;">Progress: <span id="player-progress-text">0</span>%</div>
+                </div>
+            </div>
+
+            <div class="bot-section">
+                <h3>Bot</h3>
+                <div style="height: 90px;"></div>
+                <div class="atom-display">
+                    <div class="atom" id="bot-atom">
+                        <div class="atom-nucleus"></div>
+                        <div class="atom-orbit">
+                            <div class="atom-electron"></div>
+                        </div>
+                    </div>
+                </div>
+                <div class="progress-bar">
+                    <div class="progress-fill" id="bot-progress"></div>
+                </div>
+                <div style="text-align: center; padding: 10px;">
+                    <div style="font-size: 14px;">Progress: <span id="bot-progress-text">0</span>%</div>
+                </div>
+            </div>
+        </div>
+
+        <div class="game-controls">
+            <button class="btn" onclick="window.location.href='index.html'">Back to Home</button>
+        </div>
+    </div>
+
+    <!-- Result Section -->
+    <div id="result-section" class="hidden">
+        <div id="result-box" class="result-box">
+            <h2 id="result-title">Victory!</h2>
+            <div class="result-detail">Your WPM: <strong id="result-player-wpm">0</strong></div>
+            <div class="result-detail">Bot WPM: <strong id="result-bot-wpm">0</strong></div>
+            <div class="result-detail">Accuracy: <strong id="result-accuracy">100</strong>%</div>
+            <div class="result-detail" style="margin-top: 20px;">
+                <strong id="result-stats"></strong>
+            </div>
+            <div class="game-controls" style="margin-top: 30px;">
+                <button class="btn" onclick="goToNextRacePrep()">Next Race</button>
+                <button class="btn" onclick="window.location.href='account.html'">View Stats</button>
+                <button class="btn" onclick="window.location.href='index.html'">Home</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Next Race Prep Section -->
+    <div id="next-race-prep" class="next-race-section">
+        <h2>Ready for the next race?</h2>
+        <p>Click the button below when you're ready to start your next race.</p>
+        <div class="game-controls" style="margin-top: 20px;">
+            <button class="btn" onclick="startNextRace()">Start Race</button>
+            <button class="btn" onclick="window.location.href='index.html'">Back to Home</button>
+        </div>
+    </div>
+</div>
+
+<div class="footer">
+    <a href="#">Contact</a>
+    <a href="#">Instagram</a>
+    <a href="about.html">About</a>
+    <a href="logout.html">Logout</a>
+    <a href="index.html">Home</a>
+</div>
+
+<script>
+    // Game state
+    let gameState = {
+        phase: 'placement', // placement, race, result
+        placementPrompt: '',
+        racePrompt: '',
+        placementStartTime: null,
+        raceStartTime: null,
+        playerTargetWPM: 0,
+        botSpeed: 0,
+        playerInput: '',
+        botInput: '',
+        raceFinished: false,
+        playerWPM: 0,
+        botWPM: 0,
+        raceAnimationId: null,
+        lastUpdateTime: 0
+    };
+
+    // Check if user is logged in
+    if (!app.isLoggedIn()) {
+        window.location.href = 'login.html';
+    }
+
+    // Initialize game on page load
+    window.addEventListener('DOMContentLoaded', () => {
+        checkPlacementStatus();
+    });
+
+    function checkPlacementStatus() {
+        if (app.hasCompletedPlacement()) {
+            // Skip placement, go straight to race
+            document.getElementById('placement-section').classList.add('hidden');
+            startRace();
+        } else {
+            // Show placement match
+            document.getElementById('race-section').classList.add('hidden');
+            document.getElementById('result-section').classList.add('hidden');
+        }
+    }
+
+    function startPlacementMatch() {
+        gameState.placementPrompt = app.generatePlacementPrompt();
+        document.getElementById('placement-prompt').textContent = gameState.placementPrompt;
+        document.getElementById('placement-input').disabled = false;
+        document.getElementById('placement-input').focus();
+        gameState.placementStartTime = Date.now();
+        gameState.lastUpdateTime = Date.now();
+        
+        // Start updating stats with throttling
+        updatePlacementStats();
+    }
+
+    function updatePlacementStats() {
+        const input = document.getElementById('placement-input').value;
+        const prompt = gameState.placementPrompt;
+        const timeInSeconds = (Date.now() - gameState.placementStartTime) / 1000;
+        const now = Date.now();
+
+        // Throttle updates to 60fps max
+        if (now - gameState.lastUpdateTime >= 16) {
+            gameState.lastUpdateTime = now;
+
+            if (input.length > 0) {
+                const wpm = app.calculateWPM(input.length, timeInSeconds);
+                document.getElementById('placement-wpm').textContent = Math.max(0, wpm);
+
+                // Calculate accuracy
+                let correctChars = 0;
+                for (let i = 0; i < input.length; i++) {
+                    if (input[i] === prompt[i]) {
+                        correctChars++;
+                    }
+                }
+                const accuracy = Math.round((correctChars / input.length) * 100);
+                document.getElementById('placement-accuracy').textContent = accuracy;
+                document.getElementById('placement-time').textContent = Math.round(timeInSeconds);
+
+                // If user completes the prompt
+                if (input === prompt) {
+                    gameState.playerTargetWPM = wpm;
+                    gameState.botSpeed = app.getBotSpeed(wpm);
+                    document.getElementById('placement-input').disabled = true;
+                    
+                    // Record placement completion
+                    app.completePlacement(wpm);
+                    
+                    // Delay and start race
+                    setTimeout(() => {
+                        startRace();
+                    }, 1000);
+                    return;
+                }
+            }
+        }
+
+        if (gameState.phase === 'placement' && !document.getElementById('placement-input').disabled) {
+            requestAnimationFrame(updatePlacementStats);
+        }
+    }
+
+    function startRace() {
+        gameState.phase = 'race';
+        document.getElementById('placement-section').classList.add('hidden');
+        document.getElementById('race-section').classList.remove('hidden');
+        
+        // Get bot speed from placement or current average WPM
+        let baselineWPM = gameState.playerTargetWPM;
+        if (baselineWPM === 0) {
+            const stats = app.getUserStats();
+            baselineWPM = stats.averageWPM > 0 ? stats.averageWPM : 50; // Default to 50 WPM if no data
+        }
+        gameState.botSpeed = app.getBotSpeed(baselineWPM);
+        
+        gameState.racePrompt = app.generatePlacementPrompt();
+        
+        // Display the prompt
+        document.getElementById('player-prompt-display').textContent = gameState.racePrompt;
+        document.getElementById('player-typed-text').textContent = '';
+        document.getElementById('player-remaining-text').textContent = gameState.racePrompt;
+        document.getElementById('player-remaining-text').style.left = '15px';
+        document.getElementById('player-input').value = '';
+        document.getElementById('player-input').focus();
+        document.getElementById('player-input').disabled = false;
+        
+        gameState.playerInput = '';
+        gameState.botInput = '';
+        gameState.raceStartTime = Date.now();
+        gameState.lastUpdateTime = Date.now();
+        gameState.raceFinished = false;
+        
+        // Reset progress bars
+        document.getElementById('player-progress').style.width = '0%';
+        document.getElementById('player-progress-text').textContent = '0';
+        document.getElementById('bot-progress').style.width = '0%';
+        document.getElementById('bot-progress-text').textContent = '0';
+        
+        document.getElementById('player-atom').classList.remove('active');
+        document.getElementById('bot-atom').classList.remove('active');
+        
+        // Start game loop
+        gameLoop();
+    }
+
+    function gameLoop() {
+        if (gameState.raceFinished) return;
+
+        const timeInSeconds = (Date.now() - gameState.raceStartTime) / 1000;
+        gameState.playerInput = document.getElementById('player-input').value;
+        const now = Date.now();
+
+        // Throttle updates for smoother performance
+        if (now - gameState.lastUpdateTime >= 16) {
+            gameState.lastUpdateTime = now;
+
+            // Update player display with overlay typing effect
+            if (gameState.playerInput.length > 0) {
+                // Show typed text overlaid on prompt
+                document.getElementById('player-typed-text').textContent = gameState.playerInput;
+                
+                // Show remaining untyped text with appropriate positioning
+                const remainingText = gameState.racePrompt.substring(gameState.playerInput.length);
+                const remainingDiv = document.getElementById('player-remaining-text');
+                remainingDiv.textContent = remainingText;
+                
+                // Calculate pixel offset based on typed text width
+                // Rough estimation: ~13px per character at font-size 22px, bold, monospace
+                const charWidth = 13;
+                const offset = gameState.playerInput.length * charWidth;
+                remainingDiv.style.left = (15 + offset) + 'px';
+                
+                gameState.playerWPM = app.calculateWPM(gameState.playerInput.length, timeInSeconds);
+
+                const playerProgress = (gameState.playerInput.length / gameState.racePrompt.length) * 100;
+                document.getElementById('player-progress').style.width = Math.min(playerProgress, 100) + '%';
+                document.getElementById('player-progress-text').textContent = Math.min(Math.round(playerProgress), 100);
+
+                // Activate player atom
+                document.getElementById('player-atom').classList.add('active');
+
+                // Check if player finished (90% of text typed allows for minor errors)
+                if (playerProgress >= 90) {
+                    finishRace(true);
+                    return;
+                }
+            } else {
+                document.getElementById('player-typed-text').textContent = '';
+                document.getElementById('player-remaining-text').textContent = gameState.racePrompt;
+                document.getElementById('player-remaining-text').style.left = '15px';
+                document.getElementById('player-atom').classList.remove('active');
+            }
+
+            // Simulate bot typing
+            const botCharsPerSecond = gameState.botSpeed / 12; // Assuming 12 chars per word
+            const maxBotChars = Math.floor(botCharsPerSecond * timeInSeconds);
+            gameState.botInput = gameState.racePrompt.substring(0, maxBotChars);
+
+            gameState.botWPM = Math.max(0, app.calculateWPM(gameState.botInput.length, timeInSeconds));
+
+            const botProgress = (gameState.botInput.length / gameState.racePrompt.length) * 100;
+            document.getElementById('bot-progress').style.width = Math.min(botProgress, 100) + '%';
+            document.getElementById('bot-progress-text').textContent = Math.min(Math.round(botProgress), 100);
+
+            // Activate bot atom if progressing
+            if (gameState.botInput.length > 0) {
+                document.getElementById('bot-atom').classList.add('active');
+            }
+
+            // Check if bot finished
+            if (gameState.botInput === gameState.racePrompt) {
+                finishRace(false);
+                return;
+            }
+        }
+
+        gameState.raceAnimationId = requestAnimationFrame(gameLoop);
+    }
+
+    function finishRace(playerFinished = false) {
+        if (gameState.raceFinished) return;
+        gameState.raceFinished = true;
+        cancelAnimationFrame(gameState.raceAnimationId);
+
+        document.getElementById('player-input').disabled = true;
+
+        // Give a brief moment for final animations
+        setTimeout(() => {
+            // Calculate final stats
+            const timeInSeconds = (Date.now() - gameState.raceStartTime) / 1000;
+            
+            let playerAccuracy = 100;
+            if (gameState.playerInput.length > 0) {
+                let correctChars = 0;
+                for (let i = 0; i < gameState.playerInput.length; i++) {
+                    if (gameState.playerInput[i] === gameState.racePrompt[i]) {
+                        correctChars++;
+                    }
+                }
+                playerAccuracy = Math.round((correctChars / gameState.playerInput.length) * 100);
+            }
+
+            gameState.playerWPM = app.calculateWPM(gameState.playerInput.length, timeInSeconds);
+            gameState.botWPM = app.calculateWPM(gameState.botInput.length, timeInSeconds);
+
+            const playerWon = gameState.playerWPM > gameState.botWPM;
+
+            // Record result
+            const result = app.recordRaceResult(gameState.playerWPM, gameState.botWPM, playerAccuracy, gameState.racePrompt.length);
+
+            // Show results
+            showResults(playerWon, playerAccuracy, result.stats);
+        }, 800);
+    }
+
+    function showResults(playerWon, accuracy, stats) {
+        gameState.phase = 'result';
+        document.getElementById('race-section').classList.add('hidden');
+        document.getElementById('result-section').classList.remove('hidden');
+
+        const resultBox = document.getElementById('result-box');
+        const resultTitle = document.getElementById('result-title');
+        const resultStats = document.getElementById('result-stats');
+
+        if (playerWon) {
+            resultTitle.textContent = '🎉 Victory!';
+            resultBox.classList.add('win');
+            resultBox.classList.remove('loss');
+        } else {
+            resultTitle.textContent = '😢 Defeat!';
+            resultBox.classList.add('loss');
+            resultBox.classList.remove('win');
+        }
+
+        document.getElementById('result-player-wpm').textContent = gameState.playerWPM;
+        document.getElementById('result-bot-wpm').textContent = gameState.botWPM;
+        document.getElementById('result-accuracy').textContent = accuracy;
+        resultStats.textContent = `W/L: ${stats.wins}/${stats.losses} | Average WPM: ${stats.averageWPM} | Best WPM: ${stats.bestWPM}`;
+    }
+
+    function playAgain() {
+        // For backward compatibility if needed
+        goToNextRacePrep();
+    }
+
+    function goToNextRacePrep() {
+        gameState.phase = 'nextRacePrep';
+        document.getElementById('result-section').classList.add('hidden');
+        document.getElementById('next-race-prep').classList.remove('hidden');
+    }
+
+    function startNextRace() {
+        gameState = {
+            phase: 'race', // Skip placement on replay
+            placementPrompt: '',
+            racePrompt: '',
+            placementStartTime: null,
+            raceStartTime: null,
+            playerTargetWPM: 0,
+            botSpeed: 0,
+            playerInput: '',
+            botInput: '',
+            raceFinished: false,
+            playerWPM: 0,
+            botWPM: 0,
+            raceAnimationId: null,
+            lastUpdateTime: 0
+        };
+
+        // Hide all sections first
+        document.getElementById('result-section').classList.add('hidden');
+        document.getElementById('next-race-prep').classList.add('hidden');
+        
+        // Show race section
+        document.getElementById('race-section').classList.remove('hidden');
+        
+        // Start the race
+        startRace();
+    }
+
+    // Initialize
+    document.getElementById('placement-input').disabled = true;
+    document.getElementById('race-section').classList.add('hidden');
+    document.getElementById('result-section').classList.add('hidden');
+    document.getElementById('next-race-prep').classList.add('hidden');
+</script>
+
+</body>
+</html>
