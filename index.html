@@ -2,6 +2,7 @@
 <html>
 <head>
     <title>NeuroType</title>
+    <link rel="icon" type="image/svg+xml" href="images/favicon.svg">
     <link rel="stylesheet" href="style.css">
     <script src="app.js"></script>
     <style>
@@ -48,6 +49,7 @@
 
 <!-- Navigation -->
 <div class="navbar">
+    <a href="index.html" class="site-logo" aria-label="Home">NT.</a>
     <a href="index.html">Home</a>
     <a href="about.html">About</a>
     <a href="account.html">Account</a>
@@ -57,13 +59,55 @@
 
 <!-- Main Content -->
 <div class="main">
-    <h1>NeuroType.</h1>
+    <div class="hero">
+        <svg class="hero-svg" viewBox="0 0 900 140" preserveAspectRatio="xMidYMid meet" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+            <defs>
+                <linearGradient id="heroGrad" x1="0" x2="1">
+                    <stop offset="0%" stop-color="#f3eccf" />
+                    <stop offset="50%" stop-color="#d6d0b8" />
+                    <stop offset="100%" stop-color="#b7b18f" />
+                </linearGradient>
+            </defs>
+            <rect x="0" y="0" width="900" height="140" fill="url(#heroGrad)" />
+
+            <!-- decorative atoms -->
+            <g class="hero-atoms" transform="translate(40,40)">
+                <g class="atom atom-a" transform="translate(0,0)">
+                    <circle class="orbit" cx="0" cy="0" r="22" stroke="#6f6a4e" stroke-width="2" fill="none" />
+                    <circle class="electron" cx="22" cy="0" r="5" fill="#4CAF50" />
+                </g>
+            </g>
+
+            <g class="hero-atoms" transform="translate(220,60)">
+                <g class="atom atom-b" transform="translate(0,0)">
+                    <circle class="orbit" cx="0" cy="0" r="30" stroke="#9a9570" stroke-width="2" fill="none" />
+                    <circle class="electron" cx="-30" cy="0" r="5" fill="#ffd400" />
+                </g>
+            </g>
+
+            <g class="hero-atoms" transform="translate(620,40)">
+                <g class="atom atom-c" transform="translate(0,0)">
+                    <circle class="orbit" cx="0" cy="0" r="26" stroke="#6f6a4e" stroke-width="2" fill="none" />
+                    <circle class="electron" cx="0" cy="-26" r="5" fill="#4CAF50" />
+                </g>
+            </g>
+
+            <!-- site title inside hero -->
+            <text x="450" y="88" text-anchor="middle" font-family="Georgia, serif" font-size="46" fill="#000">NeuroType.</text>
+        </svg>
+    </div>
+    
     <p>Est. 2026</p>
 
     <div class="content-box">
         <h2>Play!</h2>
         <p>Race against and<br>beat the bot!</p>
-        <button class="play-button" onclick="handlePlayClick()">START RACE</button>
+        <button class="play-button" onclick="handlePlayClick()">
+            <svg viewBox="0 0 24 24" aria-hidden="true">
+                <path d="M4 4v16l16-8z" />
+            </svg>
+            START RACE
+        </button>
     </div>
 </div>
 
@@ -103,4 +147,3 @@
 
 </body>
 </html>
-
